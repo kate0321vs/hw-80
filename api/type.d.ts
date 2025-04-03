@@ -5,3 +5,12 @@ export interface  Category {
 }
 
 export type TCategoryWithoutId = Omit<Category, 'id'>
+
+export interface ILocation {
+    id: string;
+    name: string;
+    description: string;
+}
+
+export type TLocationWithoutId = Omit<ILocation, 'id'>
+
