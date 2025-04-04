@@ -7,14 +7,13 @@ const itemsRouter = express.Router();
 itemsRouter.get('/', async (req, res) => {
     const items = await fileDb.getItems();
     if (items) {
-      const test = items.map(item => {
-          console.log(items)
+      const itemsList = items.map(item => {
           return {
               id: item.id,
               name: item.name
           }
       })
-        res.send(test);
+        res.send(itemsList);
 }
     res.sendStatus(404);
 });

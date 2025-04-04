@@ -1,16 +1,22 @@
 import express from 'express';
 import {TLocationWithoutId} from "../type";
 import fileDb from "../fileDb";
+
 const locationsRouter = express.Router();
 
 locationsRouter.get('/', async (req, res) => {
     const locations = await fileDb.getLoc();
-    res.send(locations.map(item => {
-        return {
-            id: item.id,
-            name: item.name
-        }
-    }));
+
+    if (locations) {
+        const locationsList = locations.map(item => {
+            return {
+                id: item.id,
+                name: item.name
+            }
+        })
+        res.send(locationsList);
+    }
+    res.sendStatus(404);
 });
 
 locationsRouter.get('/:id', async (req, res) => {
@@ -25,7 +31,7 @@ locationsRouter.get('/:id', async (req, res) => {
     res.send(location);
 });
 
-locationsRouter.post('/' , async (req, res) => {
+locationsRouter.post('/', async (req, res) => {
     if (req.body.name.trim().length === 0) {
         res.status(400).send({'error': 'Fields name required'});
         return;
@@ -40,7 +46,7 @@ locationsRouter.post('/' , async (req, res) => {
     res.send(savedLocation);
 });
 
-locationsRouter.delete('/:id' , async (req, res) => {
+locationsRouter.delete('/:id', async (req, res) => {
     const id = req.params.id;
     await fileDb.deleteLoc(id);
     res.send(id);

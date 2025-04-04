@@ -1,16 +1,22 @@
 import express from 'express';
 import {TCategoryWithoutId} from "../type";
 import fileDb from "../fileDb";
+
 const categoriesRouter = express.Router();
 
 categoriesRouter.get('/', async (req, res) => {
     const categories = await fileDb.getCat();
-    res.send(categories.map(item => {
-        return {
-            id: item.id,
-            name: item.name
-        }
-    }));
+
+    if (categories) {
+        const categoriesList = categories.map(item => {
+            return {
+                id: item.id,
+                name: item.name
+            }
+        })
+        res.send(categoriesList)
+    }
+    res.sendStatus(404);
 });
 
 categoriesRouter.get('/:id', async (req, res) => {
@@ -25,7 +31,7 @@ categoriesRouter.get('/:id', async (req, res) => {
     res.send(category);
 });
 
-categoriesRouter.post('/' , async (req, res) => {
+categoriesRouter.post('/', async (req, res) => {
     if (req.body.name.trim().length === 0) {
         res.status(400).send({'error': 'Fields required'});
         return;
@@ -40,7 +46,7 @@ categoriesRouter.post('/' , async (req, res) => {
     res.send(savedCategory);
 });
 
-categoriesRouter.delete('/:id' , async (req, res) => {
+categoriesRouter.delete('/:id', async (req, res) => {
     const id = req.params.id;
     await fileDb.deleteCat(id);
 })
