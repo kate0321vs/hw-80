@@ -5,7 +5,7 @@ import fileDb from "../fileDb";
 const categoriesRouter = express.Router();
 
 categoriesRouter.get('/', async (req, res) => {
-    const categories = await fileDb.getCat();
+    const categories = await fileDb.getCategories();
 
     if (categories) {
         const categoriesList = categories.map(item => {
@@ -15,12 +15,13 @@ categoriesRouter.get('/', async (req, res) => {
             }
         })
         res.send(categoriesList)
+    } else {
+        res.sendStatus(404);
     }
-    res.sendStatus(404);
 });
 
 categoriesRouter.get('/:id', async (req, res) => {
-    const categories = await fileDb.getCat();
+    const categories = await fileDb.getCategories();
     const category = categories.find(item => item.id === req.params.id);
 
     if (!category) {
@@ -33,7 +34,7 @@ categoriesRouter.get('/:id', async (req, res) => {
 
 categoriesRouter.post('/', async (req, res) => {
     if (req.body.name.trim().length === 0) {
-        res.status(400).send({'error': 'Fields required'});
+        res.status(400).send({'error': 'Field name required'});
         return;
     }
 
@@ -41,14 +42,19 @@ categoriesRouter.post('/', async (req, res) => {
         name: req.body.name,
         description: req.body.description,
     };
-    const savedCategory = await fileDb.addCat(category)
+    const savedCategory = await fileDb.addCategory(category)
 
     res.send(savedCategory);
 });
 
 categoriesRouter.delete('/:id', async (req, res) => {
     const id = req.params.id;
-    await fileDb.deleteCat(id);
+    const response = await fileDb.deleteCategory(id);
+    if (response) {
+        res.send({ message: `Category was successfully deleted.` });
+    } else {
+        res.status(404).send({ message: `Category cannot be deleted` });
+    }
 })
 
 export default categoriesRouter;

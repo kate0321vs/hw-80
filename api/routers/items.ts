@@ -10,12 +10,15 @@ itemsRouter.get('/', async (req, res) => {
       const itemsList = items.map(item => {
           return {
               id: item.id,
-              name: item.name
+              name: item.name,
+              id_category: item.id_category,
+              id_location: item.id_location,
           }
       })
         res.send(itemsList);
-}
-    res.sendStatus(404);
+} else {
+        res.sendStatus(404);
+    }
 });
 
 itemsRouter.get('/:id', async (req, res) => {
@@ -32,13 +35,12 @@ itemsRouter.get('/:id', async (req, res) => {
 
 
 itemsRouter.post('/', imagesUpload.single('image') , async (req, res) => {
-    console.log('Uploaded file:', req.file);
 
-    if (req.body.name.trim().length === 0) {
-        res.status(400).send({'error': 'Field name required'});
+    if (req.body.name.trim().length === 0 || !req.body.id_category || !req.body.id_location) {
+        res.status(400).send({'error': 'Fields name, category, location required'});
         return;
     }
-    console.log(req);
+
     const item: TItemsWithoutId = {
         name: req.body.name,
         description: req.body.description,
@@ -57,7 +59,7 @@ itemsRouter.post('/', imagesUpload.single('image') , async (req, res) => {
 itemsRouter.delete('/:id' , async (req, res) => {
     const id = req.params.id;
     await fileDb.deleteItem(id);
-    res.send(id);
+    res.send({message: 'item was deleted'});
 })
 
 export default itemsRouter;

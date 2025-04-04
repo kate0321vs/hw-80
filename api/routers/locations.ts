@@ -5,7 +5,7 @@ import fileDb from "../fileDb";
 const locationsRouter = express.Router();
 
 locationsRouter.get('/', async (req, res) => {
-    const locations = await fileDb.getLoc();
+    const locations = await fileDb.getLocations();
 
     if (locations) {
         const locationsList = locations.map(item => {
@@ -15,12 +15,13 @@ locationsRouter.get('/', async (req, res) => {
             }
         })
         res.send(locationsList);
+    } else {
+        res.sendStatus(404);
     }
-    res.sendStatus(404);
 });
 
 locationsRouter.get('/:id', async (req, res) => {
-    const locations = await fileDb.getLoc();
+    const locations = await fileDb.getLocations();
     const location = locations.find(item => item.id === req.params.id);
 
     if (!location) {
@@ -32,6 +33,8 @@ locationsRouter.get('/:id', async (req, res) => {
 });
 
 locationsRouter.post('/', async (req, res) => {
+    console.log(req.body);
+
     if (req.body.name.trim().length === 0) {
         res.status(400).send({'error': 'Fields name required'});
         return;
@@ -41,15 +44,19 @@ locationsRouter.post('/', async (req, res) => {
         name: req.body.name,
         description: req.body.description,
     };
-    const savedLocation = await fileDb.addLoc(location)
+    const savedLocation = await fileDb.addLocation(location)
 
     res.send(savedLocation);
 });
 
 locationsRouter.delete('/:id', async (req, res) => {
     const id = req.params.id;
-    await fileDb.deleteLoc(id);
-    res.send(id);
+    const response = await fileDb.deleteLocation(id);
+    if (response) {
+        res.send({ message: `Location was successfully deleted.` });
+    } else {
+        res.status(404).send({ message: `Location cannot be deleted` });
+    }
 })
 
 export default locationsRouter;

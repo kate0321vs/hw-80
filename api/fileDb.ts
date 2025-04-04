@@ -12,7 +12,7 @@ let data: { categories: Category[], locations: ILocation[], items: IItems[] } = 
 const fileDb = {
     async init() {
         try {
-            if(existsSync(pathName)) {
+            if(!existsSync(pathName)) {
                 await fs.writeFile(pathName, JSON.stringify(data));
             } else {
             const fileContents = await fs.readFile(pathName);
@@ -23,11 +23,15 @@ const fileDb = {
             data = { categories: [], locations: [], items: [] };
         }
     },
-    async getCat() {
-        return data.categories;
+    async getCategories() {
+        if (data.categories) {
+            return data.categories;
+        } return []
     },
-    async getLoc() {
-        return data.locations;
+    async getLocations() {
+        if (data.locations) {
+            return data.locations;
+        } return []
     },
     async getItems() {
         if (data.items) {
@@ -35,7 +39,7 @@ const fileDb = {
         } return []
     },
 
-    async addCat(item: TCategoryWithoutId) {
+    async addCategory(item: TCategoryWithoutId) {
         const category = {
             ...item,
             id: randomUUID(),
@@ -44,7 +48,7 @@ const fileDb = {
         await this.save();
         return category;
     },
-    async addLoc(item: TLocationWithoutId) {
+    async addLocation(item: TLocationWithoutId) {
         const location = {
             ...item,
             id: randomUUID(),
@@ -65,16 +69,42 @@ const fileDb = {
         return addedItem;
     },
 
-    async deleteCat(id: string) {
-        data.categories = data.categories.filter(category => category.id !== id);
+    async deleteCategory(id: string) {
+        const deletedCategory = data.categories.filter(category => category.id === id);
+
+        if (deletedCategory.length === 0) {
+            return false;
+        }
+
+        const usedCategory = data.items.filter(item => item.id_category === deletedCategory[0].id);
+        if (usedCategory.length > 0) {
+            return false;
+        }
+
+        data.categories = data.categories.filter(item => item.id !== id);
         await this.save();
+        return true;
     },
-    async deleteLoc(id: string) {
-        data.locations = data.locations.filter(location => location.id !== id);
+
+    async deleteLocation(id: string) {
+        const deletedLocation = data.locations.filter(location => location.id === id);
+
+        if (deletedLocation.length === 0) {
+            return false;
+        }
+
+        const usedLocation = data.items.filter(item => item.id_location === deletedLocation[0].id);
+        if (usedLocation.length > 0) {
+            return false;
+        }
+
+        data.locations = data.locations.filter(item => item.id !== id);
         await this.save();
+        return true;
     },
+
     async deleteItem(id: string) {
-        data.items = data.items.filter(item => item.id !== id);
+        data.items = data.items.filter(item => item.id === id);
         await this.save();
     },
 
