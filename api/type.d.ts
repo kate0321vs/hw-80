@@ -14,3 +14,15 @@ export interface ILocation {
 
 export type TLocationWithoutId = Omit<ILocation, 'id'>
 
+export interface IItems {
+    id: string;
+    id_location: string;
+    id_category: string;
+    name: string;
+    description: string;
+    image: string | null;
+    datetime: string;
+}
+
+export type TItemsWithoutId = Omit<IItems, 'id', 'datetime'>
+
