@@ -24,5 +24,6 @@ export interface IItems {
     datetime: string;
 }
 
-export type TItemsWithoutId = Omit<IItems, 'id', 'datetime'>
+export type TItemWithoutId = Omit<IItems, 'id'>
+
 

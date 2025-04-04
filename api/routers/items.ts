@@ -1,5 +1,5 @@
 import express from 'express';
-import {TItemsWithoutId} from "../type";
+import {TItemWithoutId} from "../type";
 import fileDb from "../fileDb";
 import {imagesUpload} from "../multer";
 const itemsRouter = express.Router();
@@ -41,20 +41,18 @@ itemsRouter.post('/', imagesUpload.single('image') , async (req, res) => {
         return;
     }
 
-    const item: TItemsWithoutId = {
+    const item: TItemWithoutId = {
         name: req.body.name,
         description: req.body.description,
         id_location: req.body.id_location,
         id_category: req.body.id_category,
         image: req.file ? 'images/' + req.file.filename : null,
+        datetime: req.body.datetime
     };
     const savedItem = await fileDb.addItem(item)
 
     res.send(savedItem);
 });
-
-
-
 
 itemsRouter.delete('/:id' , async (req, res) => {
     const id = req.params.id;

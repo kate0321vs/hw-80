@@ -1,6 +1,6 @@
 import {promises as fs} from 'fs';
 import {randomUUID} from "node:crypto";
-import {Category, IItems, ILocation, TCategoryWithoutId, TItemsWithoutId, TLocationWithoutId,} from "./type";
+import {Category, IItems, ILocation, TCategoryWithoutId, TItemWithoutId, TLocationWithoutId,} from "./type";
 import {existsSync} from "node:fs";
 
 const pathName = './db.json';
@@ -57,12 +57,11 @@ const fileDb = {
         await this.save();
         return location;
     },
-    async addItem(item: TItemsWithoutId) {
-        console.log(item)
+    async addItem(item: TItemWithoutId) {
         const addedItem = {
             ...item,
             id: randomUUID(),
-            date: new Date().toISOString(),
+            datetime: new Date().toISOString(),
         }
         data.items.push(addedItem);
         await this.save();
